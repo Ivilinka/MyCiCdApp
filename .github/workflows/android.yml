@@ -54,6 +54,10 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew assembleRelease --no-daemon
 
+      # 5.1 Поиск APK файла (для отладки)
+      - name: Find APK file
+        run: find . -name "*.apk" -type f
+
       # 6. Запуск Fastlane (плагин уже установлен на шаге 1)
       - name: Run Fastlane Distribute
         run: bundle exec fastlane distribute

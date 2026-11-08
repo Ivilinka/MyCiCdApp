@@ -1,0 +1,15 @@
+default_platform(:android)
+
+platform :android do
+  desc "Deploy to Firebase App Distribution"
+  lane :distribute do
+    firebase_app_distribution(
+      # ВАЖНО: Замените строку ниже на ваш Firebase App ID!
+      # Он выглядит примерно так: "1:1234567890:android:abcdef123456"
+      app: "1:731053736871:android:33222e5c1ee1e32ba3ec82",
+      service_credentials_file: "firebase_service_account.json",
+      groups: "qa-team",
+      android_artifact_type: "APK"
+    )
+  end
+end

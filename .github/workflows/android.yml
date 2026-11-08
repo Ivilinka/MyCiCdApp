@@ -21,26 +21,31 @@ jobs:
           java-version: 17
           cache: gradle
 
+      # 1. Настройка Ruby (автоматически установит гемы из Gemfile и Pluginfile)
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
           bundler-cache: true
 
+      # 2. Декодирование ключа подписи
       - name: Decode Keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
           echo "$KEYSTORE_BASE64" | base64 --decode > keystore.jks
 
+      # 3. Создание JSON файла для Firebase
       - name: Create Firebase Service Account File
         env:
           FIREBASE_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: echo "$FIREBASE_SA" > firebase_service_account.json
 
+      # 4. Выдача прав на выполнение Gradle
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      # 5. Сборка APK
       - name: Assemble Release APK
         env:
           KEYSTORE_PATH: keystore.jks
@@ -49,9 +54,6 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew assembleRelease --no-daemon
 
-      # Явно добавляем и устанавливаем плагин через bundle
-      - name: Add Firebase Plugin
-        run: bundle exec fastlane add_plugin firebase_app_distribution
-
+      # 6. Запуск Fastlane (плагин уже установлен на шаге 1)
       - name: Run Fastlane Distribute
         run: bundle exec fastlane distribute

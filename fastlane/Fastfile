@@ -4,10 +4,11 @@ platform :android do
   desc "Deploy to Firebase App Distribution"
   lane :distribute do
     firebase_app_distribution(
-      app: "1:731053736871:android:33222e5c1ee1e32ba3ec82", # Ваш ID из Firebase
+      app: "1:731053736871:android:33222e5c1ee1e32ba3ec82",
       service_credentials_file: "firebase_service_account.json",
       groups: "qa-team",
-      android_artifact_type: "APK"
+      android_artifact_type: "APK",
+      apk_path: "app/build/outputs/apk/release/app-release.apk" # <-- ДОБАВЬТЕ ЭТУ СТРОКУ
     )
   end
 end

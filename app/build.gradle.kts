@@ -1,18 +1,17 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.compose)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {
-    namespace = "com.example.mycicdapp"
-    compileSdk {
-        version = release(37)
-    }
+    namespace = "com.example.mycicdapp" // Убедитесь, что тут ваш namespace!
+    compileSdk = 37 // Оставляем 37, так как новые библиотеки его требуют
 
     defaultConfig {
         applicationId = "com.example.mycicdapp"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 

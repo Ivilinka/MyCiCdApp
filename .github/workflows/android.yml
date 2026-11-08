@@ -54,6 +54,10 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew assembleRelease --no-daemon
 
-      # 6. Запуск Fastlane через bundle (он уже установлен на шаге 1)
+      # 6. Установка плагина Firebase для Fastlane
+      - name: Install Firebase App Distribution Plugin
+        run: bundle exec fastlane add_plugin firebase_app_distribution
+
+      # 7. Запуск Fastlane через bundle
       - name: Run Fastlane Distribute
         run: bundle exec fastlane distribute

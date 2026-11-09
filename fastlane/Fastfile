@@ -8,7 +8,7 @@ platform :android do
       service_credentials_file: "firebase_service_account.json",
       groups: "qa-team",
       android_artifact_type: "APK",
-      apk_path: "app/build/outputs/apk/release/app-release.apk" # <-- ДОБАВЬТЕ ЭТУ СТРОКУ
+     apk_path: "app/build/outputs/apk/release/app-release.apk"
     )
   end
 end

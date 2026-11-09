@@ -23,7 +23,8 @@ android {
     // Настройка подписи для CI/CD
     signingConfigs {
         create("release") {
-            storeFile = file(System.getenv("KEYSTORE_PATH") ?: "keystore.jks")
+            // ИСПОЛЬЗУЕМ rootProject.file, чтобы искать ключ в корне проекта, а не в папке app
+            storeFile = rootProject.file(System.getenv("KEYSTORE_PATH") ?: "keystore.jks")
             storePassword = System.getenv("KEYSTORE_PASSWORD")
             keyAlias = System.getenv("KEY_ALIAS")
             keyPassword = System.getenv("KEY_PASSWORD")
@@ -58,7 +59,7 @@ android {
     }
 }
 
-// Блок kotlin вынесен из android
+// Блок kotlin находится на верхнем уровне (вне android)
 kotlin {
     compilerOptions {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)

@@ -23,11 +23,10 @@ android {
     // Настройка подписи для CI/CD
     signingConfigs {
         create("release") {
-            // ИСПОЛЬЗУЕМ rootProject.file, чтобы искать ключ в корне проекта, а не в папке app
-            storeFile = rootProject.file(System.getenv("KEYSTORE_PATH") ?: "keystore.jks")
-            storePassword = System.getenv("KEYSTORE_PASSWORD")
-            keyAlias = System.getenv("KEY_ALIAS")
-            keyPassword = System.getenv("KEY_PASSWORD")
+            storeFile = rootProject.file("keystore.jks")
+            storePassword = System.getenv("STORE_PASSWORD") ?: "12345678"
+            keyAlias = System.getenv("KEY_ALIAS") ?: "my-key-alias"
+            keyPassword = System.getenv("KEY_PASSWORD") ?: "12345678"
         }
     }
 

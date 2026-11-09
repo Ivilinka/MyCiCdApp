@@ -1,3 +1,6 @@
+gradle/*.json
+firebase_service_account.json
+keystore.jks
 *.iml
 .idea/
 .gradle

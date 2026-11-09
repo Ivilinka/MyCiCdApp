@@ -1,63 +1,48 @@
-name: Android Build & Distribute
+name: Android CI/CD Build and Distribute
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches: [ "main", "master" ] # Запускать при пуше в главную ветку
 
 jobs:
-  build:
+  build-and-distribute:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Клонируем ваш код из репозитория
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 2. Настраиваем Java (нужна для Gradle)
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
-          distribution: temurin
-          java-version: 17
+          java-version: '17'
+          distribution: 'temurin'
           cache: gradle
 
-      # 1. Настройка Ruby (автоматически установит гемы из Gemfile и Pluginfile)
-      - name: Setup Ruby
+      # 3. Настраиваем Ruby (нужен для Fastlane)
+      - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.3'
+          ruby-version: '3.3' # Версия должна совпадать с вашей локальной
           bundler-cache: true
 
-      # 2. Декодирование ключа подписи
+      # 4. Распаковываем keystore (ключ подписи) из секретов GitHub
       - name: Decode Keystore
-        env:
-          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
-          echo "$KEYSTORE_BASE64" | base64 --decode > keystore.jks
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > keystore.jks
 
-      # 3. Создание JSON файла для Firebase
-      - name: Create Firebase Service Account File
+      # 5. Создаем файл для Firebase
+      - name: Decode Firebase Credentials
+        run: |
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > firebase_service_account.json
+
+      # 6. Запускаем Fastlane
+      - name: Run Fastlane
         env:
-          FIREBASE_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        run: echo "$FIREBASE_SA" > firebase_service_account.json
-
-      # 4. Выдача прав на выполнение Gradle
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      # 5. Сборка APK
-      - name: Assemble Release APK
-        env:
-          KEYSTORE_PATH: keystore.jks
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          # Передаем пароли из секретов GitHub
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew assembleRelease --no-daemon
-
-      # 5.1 Поиск APK файла (для отладки)
-      - name: Find APK file
-        run: find . -name "*.apk" -type f
-
-      # 6. Запуск Fastlane (плагин уже установлен на шаге 1)
-      - name: Run Fastlane Distribute
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: bundle exec fastlane distribute

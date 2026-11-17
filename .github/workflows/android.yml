@@ -1,3 +1,4 @@
+
 name: Android Build & Distribute
 
 on:
@@ -21,14 +22,14 @@ jobs:
           java-version: 17
           cache: gradle
 
-      # 1. Настройка Ruby (отключаем автоматический кэш, чтобы исправить Gemfile.lock)
+      # 1. Настройка Ruby
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
           bundler-cache: false
 
-      # 2. Добавляем Linux-платформу в Gemfile.lock и устанавливаем зависимости
+      # 2. Установка зависимостей
       - name: Fix Gemfile.lock platform and install dependencies
         run: |
           bundle lock --add-platform x86_64-linux
@@ -41,17 +42,21 @@ jobs:
         run: |
           echo "$KEYSTORE_BASE64" | base64 --decode > keystore.jks
 
-      # 4. Создание JSON файла для Firebase
+      # 4. Проверка хеша ключа
+      - name: Check Keystore Hash
+        run: sha256sum keystore.jks
+
+      # 5. Создание JSON файла для Firebase
       - name: Create Firebase Service Account File
         env:
           FIREBASE_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: echo "$FIREBASE_SA" > firebase_service_account.json
 
-      # 5. Выдача прав на выполнение Gradle
+      # 6. Выдача прав на выполнение Gradle
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # 6. Сборка APK
+      # 7. Сборка APK
       - name: Assemble Release APK
         env:
           KEYSTORE_PATH: keystore.jks
@@ -60,7 +65,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew assembleRelease --no-daemon
 
-      # 7. Запуск Fastlane
+      # 8. Запуск Fastlane
       - name: Run Fastlane Distribute
         env:
           KEYSTORE_PATH: keystore.jks

@@ -1,24 +1,35 @@
+
 default_platform(:android)
 
 platform :android do
+
+  # Существующая отправка в Firebase
   desc "Собрать релиз и отправить в Firebase App Distribution"
   lane :distribute do
+    gradle(task: "assembleRelease")
 
-    # Шаг 1: Автоматическая сборка релизного APK
-    gradle(
-      task: "assembleRelease"
-    )
-
-    # Шаг 2: Загрузка и распространение
     firebase_app_distribution(
       app: "1:731053736871:android:33222e5c1ee1e32ba3ec82",
       service_credentials_file: "firebase_service_account.json",
-
-      # ОБЯЗАТЕЛЬНО замените на реальные email (можно несколько через запятую)
       testers: "samsulinaivilina@gmail.com",
-
-      # Текст, который увидят тестировщики в Firebase
       release_notes: "Новая сборка от #{Time.now.strftime('%d.%m.%Y %H:%M')}"
     )
   end
+
+  # Новая отправка в Google Play Internal Testing
+  desc "Собрать AAB и отправить в Google Play Internal Testing"
+  lane :internal do
+    gradle(task: "bundleRelease")
+
+    upload_to_play_store(
+      track: "internal",
+      aab: "app/build/outputs/bundle/release/app-release.aab",
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      json_key_data: ENV["PLAY_STORE_JSON_KEY"]
+    )
+  end
+
 end

@@ -21,7 +21,15 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 [bundle exec] fastlane android distribute
 ```
 
-Развертывание в дистрибутив приложения Firebase
+Собрать релиз и отправить в Firebase App Distribution
+
+### android internal
+
+```sh
+[bundle exec] fastlane android internal
+```
+
+Собрать AAB и отправить в Google Play Internal Testing
 
 ----
 
